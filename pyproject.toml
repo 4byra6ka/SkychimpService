@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "courseworkmodule6"
+version = "0.1.0"
+description = ""
+authors = ["Andrey Grishanov <gau@1jz.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.3"
+psycopg2-binary = "^2.9.6"
+pillow = "^10.0.0"
+python-dotenv = "^1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
