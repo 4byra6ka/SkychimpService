@@ -1,3 +1,13 @@
 from django.db import models
 
-# Create your models here.
+
+class MailingMessage(models.Model):
+    pass
+
+
+class MailingSettings(models.Model):
+    pass
+
+
+class MailingStatus(models.Model):
+    pass
