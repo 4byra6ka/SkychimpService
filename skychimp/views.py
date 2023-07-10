@@ -11,7 +11,7 @@ def main_view(request):
     return render(request, 'skychimp/main.html', context)
 
 
-class MainView(FormView):
-    template_name = 'skychimp/main.html'
+# class MainView(FormView):
+#     template_name = 'skychimp/main.html'
 
 

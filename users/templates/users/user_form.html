@@ -5,7 +5,7 @@
         <form method="post">
             {% csrf_token %}
             <img class="mb-4" src="{% static '1f412.svg' %}" alt="" width="72" height="57">
-            <h1 class="h3 mb-3 fw-normal">Пожалуйста войдите</h1>
+            <h1 class="h3 mb-3 fw-normal">Профиль пользовтеля <br> {{ user.email }}</h1>
             {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
@@ -14,23 +14,24 @@
                 {% endfor %}
             {% endif %}
             {{ form.non_field_errors }}
-            <div class="form-floating">
+            <div class="form-floating pb-3">
                 {{ form.email.errors }}
                 {{ form.email }}
                 <label for="{{ form.email.id_for_label }}">Почта</label>
             </div>
             {{ form.non_field_errors }}
-            <div class="form-floating">
-                {{ form.password.errors }}
-                {{ form.password }}
-                <label for="{{ form.password.id_for_label }}">Пароль</label>
+            <div class="form-floating pb-3">
+                {{ form.fio.errors }}
+                {{ form.fio }}
+                <label for="{{ form.fio.id_for_label }}">ФИО</label>
             </div>
-            <div class="form-check text-start my-3 text-center">
-                <a class="text-center" href="{% url 'users:recovery_password' %}">
-                    Восстановить пароль
-                </a>
+            {{ form.non_field_errors }}
+            <div class="form-floating pb-3">
+                {{ form.comment.errors }}
+                {{ form.comment }}
+                <label for="{{ form.comment.id_for_label }}">Комментарий</label>
             </div>
-            <button class="btn btn-primary w-100 py-2" type="submit">Войти</button>
+            <button class="btn btn-primary w-100 py-2" type="submit">Изменить</button>
         </form>
     </main>
 {% endblock %}

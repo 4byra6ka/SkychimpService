@@ -1,7 +1,7 @@
 from django.urls import path
 
 from skychimp.apps import SkychimpConfig
-from skychimp.views import MainView, main_view
+from skychimp.views import main_view  # MainView,
 
 app_name = SkychimpConfig.name
 
