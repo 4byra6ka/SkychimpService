@@ -1,0 +1,45 @@
+{% extends 'skychimp/base.html' %}
+{% load static %}
+{% block content %}
+    {#    <main class="w-50 m-auto"> px-md-4#}
+    <main class="col-md-9 ms-sm-auto col-lg-10 ">
+        <div class="container col-xxl-8 px-4 py-5 h-auto">
+            <form method="post">
+                {% csrf_token %}
+                <fieldset class="uk-fieldset">
+                    <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">
+                        Удалить пост "{{ object.title }}"?
+                        <button class="btn btn-outline-danger btn-lg px-4 me-md-2">
+                            Удалить
+                        </button>
+                    </h1>
+
+                </fieldset>
+            </form>
+        </div>
+        <div class="container col-xxl-8 px-4 py-5 h-auto">
+            <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+                <div class="col-10 col-sm-8 col-lg-6 ">
+                    {% if object.image %}
+                        <img src="{{ object.image.url }}" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes"
+                             loading="lazy" width="700" height="500">
+                    {% else %}
+                        <img src="{% static 'image-not-found-icon.svg' %}" class="d-block mx-lg-auto img-fluid"
+                             alt="Bootstrap Themes"
+                             loading="lazy" width="700" height="500">
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-6">
+                    <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">{{ object.title }}</h1>
+                    <div class="mb-1 text-body-secondary">
+                        Дата: {{ object.create_date }} <br>
+                        <img class="icon" width="15" height="15" src="{% static 'eye.svg' %}" alt="chimp">
+                        {{ object.count_views }}
+                    </div>
+                    <p class="lead">{{ object.content }}</p>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}
