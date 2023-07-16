@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'skychimp.apps.SkychimpConfig',
     'users.apps.UsersConfig',
     'blog.apps.BlogConfig',
+    'skysend.apps.SkySendConfig',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [

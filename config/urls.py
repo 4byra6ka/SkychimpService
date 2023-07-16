@@ -24,4 +24,5 @@ urlpatterns = [
     path('', include('skychimp.urls', namespace='skychimp')),
     path('users/', include('users.urls', namespace='users')),
     path('blog/', include('blog.urls', namespace='blog')),
+    path('skysend/', include('skysend.urls', namespace='skysend')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
