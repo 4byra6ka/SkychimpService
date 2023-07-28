@@ -7,7 +7,7 @@ from users.models import User, NULLABLE
 
 
 class MailingClient(models.Model):
-
+    mailing_settings = models.ForeignKey('MailingSettings', on_delete=models.CASCADE, **NULLABLE)
     sending_email = models.EmailField(verbose_name='контактный email')
     fio = models.CharField(max_length=100, verbose_name='фио')
     comment = models.TextField(verbose_name='комментарий')
@@ -21,6 +21,7 @@ class MailingClient(models.Model):
 
 
 class MailingMessage(models.Model):
+    mailing_settings = models.ForeignKey('MailingSettings', on_delete=models.CASCADE, **NULLABLE)
     email_subject = models.CharField(verbose_name='тема письма')
     email_body = models.TextField(verbose_name='тело письма')
 
@@ -47,8 +48,8 @@ class MailingSettings(models.Model):
     sending_time = models.TimeField(default=datetime.now(), verbose_name='время рассылки')
     intervals = models.CharField(choices=SENDING_FREQUENCY_CHOICES, verbose_name='периодичность')
     status_mailing = models.CharField(choices=STATUS_MAILING_CHOICES, verbose_name='статус рассылки')
-    mailing_client = models.ManyToManyField(MailingClient)
-    mailing_message = models.ForeignKey(MailingMessage, on_delete=models.CASCADE, **NULLABLE)
+    # mailing_client = models.ManyToManyField(MailingClient)
+    # mailing_message = models.ForeignKey(MailingMessage, on_delete=models.CASCADE, **NULLABLE)
 
     def __str__(self):
         return f'{self.pk}:{self.owner}'

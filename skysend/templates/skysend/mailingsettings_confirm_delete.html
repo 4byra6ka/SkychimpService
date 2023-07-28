@@ -2,17 +2,22 @@
 {% load static %}
 {% block content %}
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Настройка рассылки</h1>
             <div class="d-grid gap-2 d-md-flex justify-content-md-start m-1">
-                <a type="button" class="btn btn-outline-warning btn-sm px-4"
-                   href="{% url 'skysend:my_list_update_send' object.pk %}">
-                    Изменить
-                </a>
-                <a type="button" class="btn  btn-outline-danger btn-sm px-4"
-                   href="{% url 'skysend:my_list_delete_send' object.pk %}">
-                    Удалить
-                </a>
+                <form method="post">
+                    {% csrf_token %}
+                    <fieldset class="uk-fieldset">
+                        <h1 class="h2">
+                            Удалить рассылку?
+                            <button class="btn  btn-outline-danger btn-sm px-4">
+                                Удалить
+                            </button>
+                        </h1>
+
+                    </fieldset>
+                </form>
             </div>
         </div>
         <div class="table-responsive small mt-2">
@@ -29,8 +34,8 @@
                 <tr>
                     <td>{{ object.owner }}</td>
                     <td>{{ object.sending_time }}</td>
-                    <td>{{ object.get_intervals_display }}</td>
-                    <td>{{ object.get_status_mailing_display }}</td>
+                    <td>{{ object.intervals }}</td>
+                    <td>{{ object.status_mailing }}</td>
                 </tr>
                 </tbody>
             </table>
@@ -48,7 +53,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for mailing_client in object.mailingclient_set.all %}
+                {% for mailing_client in object.mailing_client.all %}
                     <tr>
                         <td>{{ mailing_client.sending_email }}</td>
                         <td>{{ mailing_client.fio }}</td>
@@ -70,12 +75,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for mailing_message in object.mailingmessage_set.all %}
                 <tr>
-                    <td>{{ mailing_message.email_subject }}</td>
-                    <td>{{ mailing_message.email_body }}</td>
+                    <td>{{ object.mailing_message.email_subject }}</td>
+                    <td>{{ object.mailing_message.email_body }}</td>
                 </tr>
-                {% endfor %}
                 </tbody>
             </table>
         </div>
