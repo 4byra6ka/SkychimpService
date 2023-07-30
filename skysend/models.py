@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from users.models import User, NULLABLE
 
@@ -26,7 +27,7 @@ class MailingMessage(models.Model):
     email_body = models.TextField(verbose_name='тело письма')
 
     def __str__(self):
-        return f'{self.email_subject}'
+        return f'"{self.email_subject}":"{self.email_subject}"'
 
     class Meta:
         verbose_name = 'Рассылка'
@@ -41,15 +42,19 @@ class MailingSettings(models.Model):
     )
     STATUS_MAILING_CHOICES = (
         ('created', 'Создана'),
+        ('edited', 'Изменено'),
         ('running', 'Запущена'),
         ('completed', 'Завершена'),
     )
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE)
     sending_time = models.TimeField(default=datetime.now(), verbose_name='время рассылки')
+    begin_date = models.DateField(default=datetime.now(), verbose_name='Начала рассылки')
+    end_date = models.DateField(verbose_name='Окончание рассылки')
     intervals = models.CharField(choices=SENDING_FREQUENCY_CHOICES, verbose_name='периодичность')
     status_mailing = models.CharField(choices=STATUS_MAILING_CHOICES, verbose_name='статус рассылки')
-    # mailing_client = models.ManyToManyField(MailingClient)
-    # mailing_message = models.ForeignKey(MailingMessage, on_delete=models.CASCADE, **NULLABLE)
+    created_at = models.DateTimeField(verbose_name='Дата создания', auto_now_add=True)
+    mailing_date_next = models.DateTimeField(verbose_name='Время следующей отправки', **NULLABLE)
+    is_active = models.BooleanField(default=True, verbose_name='Вкл/Выкл рассылку')
 
     def __str__(self):
         return f'{self.pk}:{self.owner}'
@@ -57,6 +62,7 @@ class MailingSettings(models.Model):
     class Meta:
         verbose_name = 'Настройка рассылка'
         verbose_name_plural = 'Настройки рассылки'
+        ordering = ['id']
 
 
 class MailingStatus(models.Model):

@@ -6,6 +6,11 @@ from django.views.generic import ListView, DetailView, CreateView, DeleteView, U
 from skysend.forms import MailingSettingsForm, MailingClientForm, MailingMessageForm
 from skysend.models import MailingSettings, MailingClient, MailingMessage
 
+from datetime import datetime
+from django.utils import timezone
+
+from skysend.services import datetime_send_next, cron_send_mail, one_send_mail
+
 
 class MailingSettingsListView(ListView):
     model = MailingSettings
@@ -35,6 +40,7 @@ class MailingSettingsListView(ListView):
 
 class MailingSettingsDetailView(DetailView):
     model = MailingSettings
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['title'] = context['object']
@@ -64,8 +70,10 @@ class MailingSettingsCreateView(CreateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        mailing_client_formset = inlineformset_factory(MailingSettings, MailingClient, form=MailingClientForm, extra=1, can_delete=False)
-        mailing_message_formset = inlineformset_factory(MailingSettings, MailingMessage, form=MailingMessageForm, extra=1, can_delete=False)
+        mailing_client_formset = inlineformset_factory(MailingSettings, MailingClient, form=MailingClientForm, extra=1,
+                                                       can_delete=False)
+        mailing_message_formset = inlineformset_factory(MailingSettings, MailingMessage, form=MailingMessageForm,
+                                                        extra=1, can_delete=False)
         if self.request.POST:
             context['mailing_client'] = mailing_client_formset(self.request.POST)
             context['mailing_message'] = mailing_message_formset(self.request.POST)
@@ -81,18 +89,27 @@ class MailingSettingsCreateView(CreateView):
         if form.is_valid():
             self.object = form.save(commit=False)
             self.object.owner = self.request.user
+            self.object.mailing_date_next = datetime_send_next(
+                begin_date=form.cleaned_data['begin_date'],
+                end_date=form.cleaned_data['end_date'],
+                time=form.cleaned_data['sending_time'],
+                frequence=form.cleaned_data['intervals']
+            )
             self.object.status_mailing = 'created'
+
             self.object.save()
+
         if mailing_client.is_valid():
-            for mailing_client_form in mailing_client:
-                mailing_client = mailing_client_form.save(commit=False)
-                mailing_client.mailing_settings = self.object
-                mailing_client.save()
+            mailing_client.instance = self.object
+            mailing_client.save()
         if mailing_message.is_valid():
-            for mailing_message_form in mailing_message:
-                mailing_message = mailing_message_form.save(commit=False)
-                mailing_message.mailing_settings = self.object
-                mailing_message.save()
+            mailing_message.instance = self.object
+            mailing_message.save()
+        begin_datetime = datetime.combine(form.cleaned_data['begin_date'], form.cleaned_data['sending_time'])
+        end_datetime = datetime.combine(form.cleaned_data['end_date'], form.cleaned_data['sending_time'])
+        if begin_datetime < datetime.now() < end_datetime and datetime.now() < self.object.mailing_date_next:
+            self.object.status_mailing = 'running'
+            one_send_mail(self.object)
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -106,11 +123,15 @@ class MailingSettingsUpdateView(UpdateView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['title'] = context['object']
-        mailing_client_formset = inlineformset_factory(MailingSettings, MailingClient, form=MailingClientForm, extra=1, can_delete=True)
-        mailing_message_formset = inlineformset_factory(MailingSettings, MailingMessage, form=MailingMessageForm, extra=1, can_delete=True)
+        mailing_client_formset = inlineformset_factory(MailingSettings, MailingClient, form=MailingClientForm, extra=1,
+                                                       can_delete=True)
+        mailing_message_formset = inlineformset_factory(MailingSettings, MailingMessage, form=MailingMessageForm,
+                                                        extra=1, can_delete=True)
         if self.request.POST:
-            context['mailing_client'] = mailing_client_formset(self.request.POST, instance=self.object, prefix="mailing_client")
-            context['mailing_message'] = mailing_message_formset(self.request.POST, instance=self.object, prefix="mailing_message")
+            context['mailing_client'] = mailing_client_formset(self.request.POST, instance=self.object,
+                                                               prefix="mailing_client")
+            context['mailing_message'] = mailing_message_formset(self.request.POST, instance=self.object,
+                                                                 prefix="mailing_message")
         else:
             context['mailing_client'] = mailing_client_formset(instance=self.object, prefix="mailing_client")
             context['mailing_message'] = mailing_message_formset(instance=self.object, prefix="mailing_message")
@@ -121,6 +142,19 @@ class MailingSettingsUpdateView(UpdateView):
         mailing_client = context['mailing_client']
         mailing_message = context['mailing_message']
         self.object = form.save()
+        self.object.mailing_date_next = datetime_send_next(
+            begin_date=form.cleaned_data['begin_date'],
+            end_date=form.cleaned_data['end_date'],
+            time=form.cleaned_data['sending_time'],
+            frequence=form.cleaned_data['intervals']
+        )
+        if self.object.mailing_date_next < timezone.now() and form.cleaned_data['is_active']:
+            self.object.is_active = False
+            self.object.status_mailing = 'completed'
+        elif not self.object.is_active:
+            self.object.status_mailing = 'completed'
+        else:
+            self.object.status_mailing = 'edited'
         self.object.save()
         if mailing_client.is_valid():
             mailing_client.instance = self.object
@@ -128,6 +162,7 @@ class MailingSettingsUpdateView(UpdateView):
         if mailing_message.is_valid():
             mailing_message.instance = self.object
             mailing_message.save()
+        test = cron_send_mail()
         return super().form_valid(form)
 
     def get_success_url(self):

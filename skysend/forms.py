@@ -29,7 +29,7 @@ class MailingSettingsForm(forms.ModelForm):
 
     class Meta:
         model = MailingSettings
-        fields = ('sending_time', 'intervals')
+        fields = ('sending_time', 'begin_date', 'end_date', 'intervals', 'is_active')
         # widgets = {
         #     'sending_time': forms.TimeField(),
         #     'intervals': forms.ChoiceField(choices=SENDING_FREQUENCY_CHOICES),

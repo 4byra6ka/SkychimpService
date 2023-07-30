@@ -161,3 +161,7 @@ if CACHE_ENABLED:
             "LOCATION": os.getenv('CACHES_LOCATION'),
         }
     }
+
+CRONJOBS = [
+    ('*/2 * * * *', 'skysend.services.cron_send_mail', '>> scheduled_job.log')
+]

@@ -3,7 +3,14 @@
 {% block content %}
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">Настройка рассылки</h1>
+            <h1 class="h2">
+                Настройка рассылки
+                {% if object.is_active %}
+                    <span class="badge text-bg-success">Активна</span>
+                {% else %}
+                    <span class="badge text-bg-danger">Не активна</span>
+                {% endif %}
+            </h1>
             <div class="d-grid gap-2 d-md-flex justify-content-md-start m-1">
                 <a type="button" class="btn btn-outline-warning btn-sm px-4"
                    href="{% url 'skysend:my_list_update_send' object.pk %}">
@@ -20,17 +27,21 @@
                 <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">время рассылки</th>
-                    <th scope="col">периодичность</th>
-                    <th scope="col">статус рассылки</th>
+                    <th scope="col">Начало рассылки</th>
+                    <th scope="col">Окончание рассылки</th>
+                    <th scope="col">Периодичность</th>
+                    <th scope="col">Статус рассылки</th>
+                    <th scope="col">Отправка</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
-                    <td>{{ object.owner }}</td>
-                    <td>{{ object.sending_time }}</td>
+                    <td>{{ object.pk }}</td>
+                    <td>{{ object.begin_date }} {{ object.sending_time }}</td>
+                    <td>{{ object.end_date }} {{ object.sending_time }}</td>
                     <td>{{ object.get_intervals_display }}</td>
                     <td>{{ object.get_status_mailing_display }}</td>
+                    <td>{{ object.mailing_date_next }}</td>
                 </tr>
                 </tbody>
             </table>
@@ -71,10 +82,10 @@
                 </thead>
                 <tbody>
                 {% for mailing_message in object.mailingmessage_set.all %}
-                <tr>
-                    <td>{{ mailing_message.email_subject }}</td>
-                    <td>{{ mailing_message.email_body }}</td>
-                </tr>
+                    <tr>
+                        <td>{{ mailing_message.email_subject }}</td>
+                        <td>{{ mailing_message.email_body }}</td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
@@ -95,7 +106,13 @@
                 {% for mailing_status in object.mailingstatus_set.all %}
                     <tr>
                         <td>{{ mailing_status.data_time_status }}</td>
-                        <td>{{ mailing_status.attempted_status }}</td>
+                        <td>
+                            {% if mailing_status.attempted_status %}
+                                Успешно
+                            {% else %}
+                                Ошибка
+                            {% endif %}
+                        </td>
                         <td>{{ mailing_status.mail_server_response }}</td>
                     </tr>
                 {% endfor %}
