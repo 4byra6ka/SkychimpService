@@ -84,9 +84,7 @@ class MailingSettingsCreateView(PermissionRequiredMixin, CreateView):
                 frequence=form.cleaned_data['intervals']
             )
             self.object.status_mailing = 'created'
-
             self.object.save()
-
         if mailing_client.is_valid():
             mailing_client.instance = self.object
             mailing_client.save()
@@ -182,7 +180,6 @@ def change_is_active(request, *args, **kwargs):
     if mailing_settings.is_active:
         mailing_settings.is_active = False
         mailing_settings.status_mailing = 'completed'
-
     else:
         mailing_date_next = datetime_send_next(
             begin_date=mailing_settings.begin_date,

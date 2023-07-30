@@ -4,14 +4,7 @@
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Главная страница</h1>
-{#            <div class="btn-toolbar mb-2 mb-md-0">#}
-{#                <div class="btn-group me-2">#}
-{#                    <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>#}
-{#                    <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>#}
-{#                </div>#}
-{#            </div>#}
         </div>
-
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <div class="col-sm-6 mb-3 mb-sm-0">
                 <div class="card">
@@ -47,97 +40,35 @@
                 </div>
             </div>
         </div>
-
         <div class="pt-3 border-bottom">
             <h2>Блог</h2>
         </div>
         <div class="row row-cols-1 row-cols-md-3 g-4 h-auto card-group">
             {% for blog in blogs %}
                 <div class="col-sm-6 ">
-                <div class="row g-0 border rounded overflow-hidden flex-md-row mb-3 shadow-sm h-md-250 position-relative mt-3 card">
-                    <div class="col p-4 d-flex flex-column position-static">
-                        {% if not blog.is_published %}
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                                <span class="badge text-bg-danger">Не опубликован</span>
+                    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-3 shadow-sm h-md-250 position-relative mt-3 card">
+                        <div class="col p-4 d-flex flex-column position-static">
+                            {% if not blog.is_published %}
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                                    <span class="badge text-bg-danger">Не опубликован</span>
+                                </div>
+                            {% endif %}
+                            <h3 class="mb-0">{{ blog.title }}</h3>
+                            <div class="mb-1 text-body-secondary">
+                                Дата: {{ blog.create_date }} <br>
+                                <img class="icon" width="15" height="15" src="{% static 'eye.svg' %}" alt="chimp">
+                                {{ blog.count_views }}
                             </div>
-                        {% endif %}
-                        <h3 class="mb-0">{{ blog.title }}</h3>
-                        <div class="mb-1 text-body-secondary">
-                            Дата: {{ blog.create_date }} <br>
-                            <img class="icon" width="15" height="15" src="{% static 'eye.svg' %}" alt="chimp">
-                            {{ blog.count_views }}
-                        </div>
-                        <p class="card-text mb-1">{{ blog.content|slice:100 }}</p>
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                            <a href="{% url 'blog:blog' blog.pk %}" class="btn btn-outline-secondary">
-                                Прочитать
-                            </a>
+                            <p class="card-text mb-1">{{ blog.content|slice:100 }}</p>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                                <a href="{% url 'blog:blog' blog.pk %}" class="btn btn-outline-secondary">
+                                    Прочитать
+                                </a>
+                            </div>
                         </div>
                     </div>
-{#                    <div class="col-auto d-none d-lg-block">#}
-{#                        {% if object.image %}#}
-{#                            <img src="{{ blog.image.url }}" class="bd-placeholder-img" width="200" height="250">#}
-{#                        {% else %}#}
-{#                            <img src="{% static 'image-not-found-icon.svg' %}" class="bd-placeholder-img" width="200"#}
-{#                                 height="250">#}
-{#                        {% endif %}#}
-{##}
-{#                        <rect width="100%" height="100%" fill="#55595c"></rect>#}
-{#                        </svg>#}
-{#                    </div>#}
-                </div>
                 </div>
             {% endfor %}
-        </div>
-        <div class="table-responsive small">
-            <table class="table table-striped table-sm">
-                <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Header</th>
-                    <th scope="col">Header</th>
-                    <th scope="col">Header</th>
-                    <th scope="col">Header</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>1,001</td>
-                    <td>random</td>
-                    <td>data</td>
-                    <td>placeholder</td>
-                    <td>text</td>
-                </tr>
-                <tr>
-                    <td>1,002</td>
-                    <td>placeholder</td>
-                    <td>irrelevant</td>
-                    <td>visual</td>
-                    <td>layout</td>
-                </tr>
-                <tr>
-                    <td>1,003</td>
-                    <td>data</td>
-                    <td>rich</td>
-                    <td>dashboard</td>
-                    <td>tabular</td>
-                </tr>
-                <tr>
-                    <td>1,003</td>
-                    <td>information</td>
-                    <td>placeholder</td>
-                    <td>illustrative</td>
-                    <td>data</td>
-                </tr>
-                <tr>
-                    <td>1,004</td>
-                    <td>text</td>
-                    <td>random</td>
-                    <td>layout</td>
-                    <td>dashboard</td>
-                </tr>
-                </tbody>
-            </table>
         </div>
     </main>
 {% endblock %}
