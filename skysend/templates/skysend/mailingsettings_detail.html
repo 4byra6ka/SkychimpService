@@ -11,15 +11,29 @@
                     <span class="badge text-bg-danger">Не активна</span>
                 {% endif %}
             </h1>
+
             <div class="d-grid gap-2 d-md-flex justify-content-md-start m-1">
-                <a type="button" class="btn btn-outline-warning btn-sm px-4"
-                   href="{% url 'skysend:my_list_update_send' object.pk %}">
-                    Изменить
-                </a>
-                <a type="button" class="btn  btn-outline-danger btn-sm px-4"
-                   href="{% url 'skysend:my_list_delete_send' object.pk %}">
-                    Удалить
-                </a>
+                {% if user.is_staff and object.is_active %}
+                    <a type="button" class="btn btn-outline-danger btn-sm px-4"
+                       href="{% url 'skysend:change_is_active' object.pk %}">
+                        Отключать рассылку
+                    </a>
+                {% elif user.is_staff and not object.is_active %}
+                    <a type="button" class="btn btn-outline-success btn-sm px-4"
+                       href="{% url 'skysend:change_is_active' object.pk %}">
+                        Включить рассылку
+                    </a>
+                {% endif %}
+                {% if not user.is_staff or user.is_superuser %}
+                    <a type="button" class="btn btn-outline-warning btn-sm px-4"
+                       href="{% url 'skysend:my_list_update_send' object.pk %}">
+                        Изменить
+                    </a>
+                    <a type="button" class="btn  btn-outline-danger btn-sm px-4"
+                       href="{% url 'skysend:my_list_delete_send' object.pk %}">
+                        Удалить
+                    </a>
+                {% endif %}
             </div>
         </div>
         <div class="table-responsive small mt-2">

@@ -1,4 +1,7 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.forms import inlineformset_factory
+from django.shortcuts import redirect
 
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
@@ -12,61 +15,46 @@ from django.utils import timezone
 from skysend.services import datetime_send_next, cron_send_mail, one_send_mail
 
 
-class MailingSettingsListView(ListView):
+class MailingSettingsListView(PermissionRequiredMixin, ListView):
+    """Просмотр рассылок"""
     model = MailingSettings
     extra_context = {
         'title': 'Мои рассылки'
     }
+    permission_required = ['skysend.view_mailingsettings']
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        # all_product = Product.objects.all()
-        # context['all_product_list'] = all_product
-        # context['object_sends_list'] = MailingSettings.objects.filter(is_a) # Product.active_version()
-        # mailing_settings = MailingSettings.objects.get_queryset()
-        # context['object_sends_list'] = mailing_settings.
+        if self.request.user.is_staff:
+            context['object_list'] = MailingSettings.objects.all()
+        else:
+            context['object_list'] = MailingSettings.objects.filter(owner=self.request.user)
         return context
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        # queryset.
-        # if self.request.user.is_staff or self.request.user.groups.filter(name='moderators').exists():
-        #     return queryset
-        # else:
-        #     return queryset
-        #     queryset = queryset.filter(is_published=True)
-        return queryset
 
-
-class MailingSettingsDetailView(DetailView):
+class MailingSettingsDetailView(PermissionRequiredMixin, DetailView):
+    """Просмотр одной рассылки"""
     model = MailingSettings
+    permission_required = ['skysend.view_mailingsettings']
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['title'] = context['object']
-        context['mailing_client'] = MailingClient.objects.filter(pk=self.object.pk)
-        # context['is_edit'] = True
-        # if self.object.owner != self.request.user and not self.request.user.is_superuser and not self.request.user.is_staff:
-        #     context['is_edit'] = False
+        if self.request.user.is_staff or self.request.user == self.object.owner:
+            context['mailing_client'] = MailingClient.objects.filter(pk=self.object.pk)
+        else:
+            raise PermissionDenied()
         return context
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        # queryset.
-        # if self.request.user.is_staff or self.request.user.groups.filter(name='moderators').exists():
-        #     return queryset
-        # else:
-        #     return queryset
-        #     queryset = queryset.filter(is_published=True)
-        return queryset
 
-
-class MailingSettingsCreateView(CreateView):
+class MailingSettingsCreateView(PermissionRequiredMixin, CreateView):
+    """Создание рассылки"""
     model = MailingSettings
     form_class = MailingSettingsForm
     extra_context = {
         'title': 'Добавить рассылку'
     }
+    permission_required = ['skysend.add_mailingsettings']
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -107,7 +95,7 @@ class MailingSettingsCreateView(CreateView):
             mailing_message.save()
         begin_datetime = datetime.combine(form.cleaned_data['begin_date'], form.cleaned_data['sending_time'])
         end_datetime = datetime.combine(form.cleaned_data['end_date'], form.cleaned_data['sending_time'])
-        if begin_datetime < datetime.now() < end_datetime and datetime.now() < self.object.mailing_date_next:
+        if begin_datetime < datetime.now() < end_datetime and timezone.now() < self.object.mailing_date_next:
             self.object.status_mailing = 'running'
             one_send_mail(self.object)
         return super().form_valid(form)
@@ -116,12 +104,16 @@ class MailingSettingsCreateView(CreateView):
         return reverse_lazy('skysend:my_list_detail_send', kwargs={'pk': self.object.pk})
 
 
-class MailingSettingsUpdateView(UpdateView):
+class MailingSettingsUpdateView(PermissionRequiredMixin, UpdateView):
+    """Обновление рассылки"""
     model = MailingSettings
     form_class = MailingSettingsForm
+    permission_required = ['skysend.change_mailingsettings']
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        if self.request.user != self.object.owner and not self.request.user.is_superuser:
+            raise PermissionDenied()
         context['title'] = context['object']
         mailing_client_formset = inlineformset_factory(MailingSettings, MailingClient, form=MailingClientForm, extra=1,
                                                        can_delete=True)
@@ -162,15 +154,45 @@ class MailingSettingsUpdateView(UpdateView):
         if mailing_message.is_valid():
             mailing_message.instance = self.object
             mailing_message.save()
-        test = cron_send_mail()
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('skysend:my_list_detail_send', kwargs={'pk': self.object.pk})
 
 
-class MailingSettingsDeleteView(DeleteView):
+class MailingSettingsDeleteView(PermissionRequiredMixin, DeleteView):
+    """Удаление рассылки"""
     model = MailingSettings
+    permission_required = ['skysend.delete_mailingsettings']
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['title'] = context['object']
+        return context
 
     def get_success_url(self):
         return reverse_lazy('skysend:my_list_send')
+
+
+def change_is_active(request, *args, **kwargs):
+    """Процедура включения/отключения рассылки модератором"""
+    if not request.user.is_staff:
+        raise PermissionDenied()
+    mailing_settings = MailingSettings.objects.get(pk=kwargs['pk'])
+    if mailing_settings.is_active:
+        mailing_settings.is_active = False
+        mailing_settings.status_mailing = 'completed'
+
+    else:
+        mailing_date_next = datetime_send_next(
+            begin_date=mailing_settings.begin_date,
+            end_date=mailing_settings.end_date,
+            time=mailing_settings.sending_time,
+            frequence=mailing_settings.intervals
+        )
+        if mailing_date_next > timezone.now():
+            mailing_settings.is_active = True
+            mailing_settings.status_mailing = 'running'
+            mailing_settings.mailing_date_next = mailing_date_next
+    mailing_settings.save()
+    return redirect(reverse_lazy('skysend:my_list_detail_send', kwargs={'pk': kwargs['pk']}))

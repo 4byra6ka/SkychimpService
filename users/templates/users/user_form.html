@@ -21,15 +21,15 @@
             </div>
             {{ form.non_field_errors }}
             <div class="form-floating pb-3">
-                {{ form.fio.errors }}
-                {{ form.fio }}
-                <label for="{{ form.fio.id_for_label }}">ФИО</label>
+                {{ form.first_name.errors }}
+                {{ form.first_name }}
+                <label for="{{ form.first_name.id_for_label }}">Имя</label>
             </div>
             {{ form.non_field_errors }}
             <div class="form-floating pb-3">
-                {{ form.comment.errors }}
-                {{ form.comment }}
-                <label for="{{ form.comment.id_for_label }}">Комментарий</label>
+                {{ form.last_name.errors }}
+                {{ form.last_name }}
+                <label for="{{ form.last_name.id_for_label }}">Фамилия</label>
             </div>
             <button class="btn btn-primary w-100 py-2" type="submit">Изменить</button>
         </form>

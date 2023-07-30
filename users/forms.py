@@ -27,15 +27,17 @@ class UserRegisterForm(UserCreationForm):
 class UserProfileForm(UserChangeForm):
     class Meta:
         model = User
-        fields = ('email', 'fio', 'comment')
+        fields = ('email', 'first_name', 'last_name')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            if field_name == 'email' or field_name == 'fio' or field_name == 'comment':
+            if field_name == 'email' or field_name == 'first_name' or field_name == 'last_name':
                 field.widget.attrs['class'] = 'form-control'
-            if field_name == 'comment':
-                field.widget.attrs['style'] = "height: 100px"
+            if field_name == 'first_name':
+                field.widget.attrs['class'] = 'form-control'
+            if field_name == 'last_name':
+                field.widget.attrs['class'] = 'form-control'
             if field_name == 'email':
                 field.widget.attrs['type'] = "email_recovery"
 

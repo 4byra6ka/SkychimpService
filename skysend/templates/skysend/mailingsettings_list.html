@@ -25,12 +25,18 @@
                         <td>{{ object.pk }}</td>
                         {% if object.is_active %}
                             <td><span class="badge text-bg-success">Активна</span></td>
+                            {% if user.is_staff %}
+                                <td>{{ object.owner }}</td>
+                            {% endif %}
                             <td>{{ object.begin_date }} {{ object.sending_time }}</td>
                             <td>{{ object.end_date }} {{ object.sending_time }}</td>
                             <td>{{ object.get_intervals_display }}</td>
                             <td>{{ object.get_status_mailing_display }}</td>
                         {% else %}
                             <td><span class="badge text-bg-danger">Не активна</span></td>
+                            {% if user.is_staff %}
+                                <td>{{ object.owner }}</td>
+                            {% endif %}
                             <td><s>{{ object.begin_date }} {{ object.sending_time }}</s></td>
                             <td><s>{{ object.end_date }} {{ object.sending_time }}</s></td>
                             <td><s>{{ object.get_intervals_display }}</s></td>
