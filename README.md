@@ -46,3 +46,4 @@
     cd CourseWorkModule6
     poetry install
     python manage.py runserver <IP>:<PORT>
+    python manage.py crontab add
