@@ -1,0 +1,109 @@
+{% extends 'skychimp/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Настройка рассылки</h1>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start m-1">
+                <form method="post">
+                    {% csrf_token %}
+                    <fieldset class="uk-fieldset">
+                        <h1 class="h2">
+                            Удалить рассылку?
+                            <button class="btn  btn-outline-danger btn-sm px-4">
+                                Удалить
+                            </button>
+                        </h1>
+
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <div class="table-responsive small mt-2">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">время рассылки</th>
+                    <th scope="col">периодичность</th>
+                    <th scope="col">статус рассылки</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{ object.owner }}</td>
+                    <td>{{ object.sending_time }}</td>
+                    <td>{{ object.intervals }}</td>
+                    <td>{{ object.status_mailing }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pt-3 border-bottom">
+            <h2>Список клиентов</h2>
+        </div>
+        <div class="table-responsive small mt-2">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Контактный email</th>
+                    <th scope="col">ФИО</th>
+                    <th scope="col">Комментарий</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for mailing_client in object.mailing_client.all %}
+                    <tr>
+                        <td>{{ mailing_client.sending_email }}</td>
+                        <td>{{ mailing_client.fio }}</td>
+                        <td>{{ mailing_client.comment }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pt-3 border-bottom">
+            <h2>Сообщение рассылки</h2>
+        </div>
+        <div class="table-responsive small mt-2">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Тема письма</th>
+                    <th scope="col">Тело письма</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{ object.mailing_message.email_subject }}</td>
+                    <td>{{ object.mailing_message.email_body }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pt-3 border-bottom">
+            <h2>Статус рассылки</h2>
+        </div>
+        <div class="table-responsive small mt-2">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Дата последней попытки</th>
+                    <th scope="col">Статус попытки</th>
+                    <th scope="col">Ответ почтового сервера</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for mailing_status in object.mailingstatus_set.all %}
+                    <tr>
+                        <td>{{ mailing_status.data_time_status }}</td>
+                        <td>{{ mailing_status.attempted_status }}</td>
+                        <td>{{ mailing_status.mail_server_response }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+{% endblock %}

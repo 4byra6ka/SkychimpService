@@ -1,0 +1,137 @@
+{% extends 'skychimp/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">
+                Настройка рассылки
+                {% if object.is_active %}
+                    <span class="badge text-bg-success">Активна</span>
+                {% else %}
+                    <span class="badge text-bg-danger">Не активна</span>
+                {% endif %}
+            </h1>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start m-1">
+                {% if user.is_staff and object.is_active %}
+                    <a type="button" class="btn btn-outline-danger btn-sm px-4"
+                       href="{% url 'skysend:change_is_active' object.pk %}">
+                        Отключать рассылку
+                    </a>
+                {% elif user.is_staff and not object.is_active %}
+                    <a type="button" class="btn btn-outline-success btn-sm px-4"
+                       href="{% url 'skysend:change_is_active' object.pk %}">
+                        Включить рассылку
+                    </a>
+                {% endif %}
+                {% if not user.is_staff or user.is_superuser %}
+                    <a type="button" class="btn btn-outline-warning btn-sm px-4"
+                       href="{% url 'skysend:my_list_update_send' object.pk %}">
+                        Изменить
+                    </a>
+                    <a type="button" class="btn  btn-outline-danger btn-sm px-4"
+                       href="{% url 'skysend:my_list_delete_send' object.pk %}">
+                        Удалить
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="table-responsive small mt-2">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Начало рассылки</th>
+                    <th scope="col">Окончание рассылки</th>
+                    <th scope="col">Периодичность</th>
+                    <th scope="col">Статус рассылки</th>
+                    <th scope="col">Отправка</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{ object.pk }}</td>
+                    <td>{{ object.begin_date }} {{ object.sending_time }}</td>
+                    <td>{{ object.end_date }} {{ object.sending_time }}</td>
+                    <td>{{ object.get_intervals_display }}</td>
+                    <td>{{ object.get_status_mailing_display }}</td>
+                    <td>{{ object.mailing_date_next }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pt-3 border-bottom">
+            <h2>Список клиентов</h2>
+        </div>
+        <div class="table-responsive small mt-2">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Контактный email</th>
+                    <th scope="col">ФИО</th>
+                    <th scope="col">Комментарий</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for mailing_client in object.mailingclient_set.all %}
+                    <tr>
+                        <td>{{ mailing_client.sending_email }}</td>
+                        <td>{{ mailing_client.fio }}</td>
+                        <td>{{ mailing_client.comment }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pt-3 border-bottom">
+            <h2>Сообщение рассылки</h2>
+        </div>
+        <div class="table-responsive small mt-2">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Тема письма</th>
+                    <th scope="col">Тело письма</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for mailing_message in object.mailingmessage_set.all %}
+                    <tr>
+                        <td>{{ mailing_message.email_subject }}</td>
+                        <td>{{ mailing_message.email_body }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pt-3 border-bottom">
+            <h2>Статус рассылки</h2>
+        </div>
+        <div class="table-responsive small mt-2">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Дата последней попытки</th>
+                    <th scope="col">Статус попытки</th>
+                    <th scope="col">Ответ почтового сервера</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for mailing_status in object.mailingstatus_set.all %}
+                    <tr>
+                        <td>{{ mailing_status.data_time_status }}</td>
+                        <td>
+                            {% if mailing_status.attempted_status %}
+                                Успешно
+                            {% else %}
+                                Ошибка
+                            {% endif %}
+                        </td>
+                        <td>{{ mailing_status.mail_server_response }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+{% endblock %}
