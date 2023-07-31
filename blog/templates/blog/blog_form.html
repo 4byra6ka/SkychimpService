@@ -1,0 +1,53 @@
+{% extends 'skychimp/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="w-50 m-auto">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-2">
+                    <img class="mb-4" src="{% static 'blog-svgrepo-com.svg' %}" alt="" width="72" height="57">
+                </div>
+                <div class="col-10"><h1 class="h3 mb-3 fw-normal">Новый пост</h1></div>
+            </div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {{ form.non_field_errors }}
+            <div class="form-floating pb-3">
+                {{ form.title.errors }}
+                {{ form.title }}
+                <label for="{{ form.title.id_for_label }}">Заголовок</label>
+            </div>
+            {{ form.non_field_errors }}
+            <div class="form-floating pb-3">
+                {{ form.content.errors }}
+                {{ form.content }}
+                <label for="{{ form.content.id_for_label }}">Cодержимое</label>
+            </div>
+            {{ form.non_field_errors }}
+            <div class="input-group pb-3">
+                {{ form.image.errors }}
+                <label class="input-group-text" for="{{ form.image.id_for_label }}">Изображение</label>
+                {{ form.image }}
+            </div>
+            {{ form.non_field_errors }}
+            <div class="form-check pb-3">
+                {{ form.is_published.errors }}
+                {{ form.is_published }}
+                <label class="form-check-label" for="{{ form.is_published.id_for_label }}">Признак публикации</label>
+            </div>
+            <button class="btn btn-primary w-100 py-2" type="submit">
+                {% if object %}
+                    Изменить
+                {% else %}
+                    Создать пост
+                {% endif %}
+            </button>
+        </form>
+    </main>
+{% endblock %}

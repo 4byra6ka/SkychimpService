@@ -1,0 +1,55 @@
+{% extends 'skychimp/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Мои рассылки</h1>
+        </div>
+
+        <div class="table-responsive small mt-2">
+            <table class="table table-striped table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Начало рассылки</th>
+                    <th scope="col">Окончание рассылки</th>
+                    <th scope="col">Периодичность</th>
+                    <th scope="col">Статус рассылки</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for object in object_list %}
+                    <tr>
+                        <td>{{ object.pk }}</td>
+                        {% if object.is_active %}
+                            <td><span class="badge text-bg-success">Активна</span></td>
+                            {% if user.is_staff %}
+                                <td>{{ object.owner }}</td>
+                            {% endif %}
+                            <td>{{ object.begin_date }} {{ object.sending_time }}</td>
+                            <td>{{ object.end_date }} {{ object.sending_time }}</td>
+                            <td>{{ object.get_intervals_display }}</td>
+                            <td>{{ object.get_status_mailing_display }}</td>
+                        {% else %}
+                            <td><span class="badge text-bg-danger">Не активна</span></td>
+                            {% if user.is_staff %}
+                                <td>{{ object.owner }}</td>
+                            {% endif %}
+                            <td><s>{{ object.begin_date }} {{ object.sending_time }}</s></td>
+                            <td><s>{{ object.end_date }} {{ object.sending_time }}</s></td>
+                            <td><s>{{ object.get_intervals_display }}</s></td>
+                            <td><s>{{ object.get_status_mailing_display }}</s></td>
+                        {% endif %}
+                        <td><a class="btn btn-primary " href="{% url 'skysend:my_list_detail_send' object.pk %}"
+                               role="button"
+                               style="--bs-btn-padding-y: .05rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">Посмотреть</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'skychimp/base.html' %}
+{% load static %}
+{% block content %}
+    <main class="form-signin w-100 m-auto">
+        <form method="post">
+            {% csrf_token %}
+            <img class="mb-4" src="{% static '1f412.svg' %}" alt="" width="72" height="57">
+            <h1 class="h3 mb-3 fw-normal">Профиль пользовтеля <br> {{ user.email }}</h1>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {{ form.non_field_errors }}
+            <div class="form-floating pb-3">
+                {{ form.email.errors }}
+                {{ form.email }}
+                <label for="{{ form.email.id_for_label }}">Почта</label>
+            </div>
+            {{ form.non_field_errors }}
+            <div class="form-floating pb-3">
+                {{ form.first_name.errors }}
+                {{ form.first_name }}
+                <label for="{{ form.first_name.id_for_label }}">Имя</label>
+            </div>
+            {{ form.non_field_errors }}
+            <div class="form-floating pb-3">
+                {{ form.last_name.errors }}
+                {{ form.last_name }}
+                <label for="{{ form.last_name.id_for_label }}">Фамилия</label>
+            </div>
+            <button class="btn btn-primary w-100 py-2" type="submit">Изменить</button>
+        </form>
+    </main>
+{% endblock %}
