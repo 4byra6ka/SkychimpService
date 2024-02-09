@@ -1,6 +1,6 @@
 # <img src="https://notion-emojis.s3-us-west-2.amazonaws.com/prod/svg-twitter/1f412.svg" width="89"/>
 
-## Курсовой проект по Django "Сервис Skychimp"
+## Django проект "Сервис Skychimp"
 
 #### Проект модуля 6 реализована рассылка для отправки уведомлений клиентам, блог для продвижения сервиса.
 ***
