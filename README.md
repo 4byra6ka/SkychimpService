@@ -2,7 +2,7 @@
 
 ## Django проект "Сервис Skychimp"
 
-#### Проект модуля 6 реализована рассылка для отправки уведомлений клиентам, блог для продвижения сервиса.
+#### Проекте реализована рассылка для отправки уведомлений клиентам, блог для продвижения сервиса.
 ***
 #### Реализованы задачи:
 * Интерфейс заполнения рассылок, то есть CRUD механизм для управления рассылками.
@@ -42,8 +42,8 @@
 
 ***
 ### Разворачивание проекта "Сервис Skychimp"
-    git cline https://github.com/4byra6ka/CourseWorkModule6.git
-    cd CourseWorkModule6
+    git cline https://github.com/4byra6ka/SkychimpService.git
+    cd SkychimpService
     poetry install
     python manage.py runserver <IP>:<PORT>
     python manage.py crontab add
